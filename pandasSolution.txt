@@ -1,0 +1,23 @@
+import pandas as pd
+
+sql_conn = sqlite3.connect("EmpData.db") 
+
+customer = pd.read_sql_query("SELECT * FROM Customers", sql_conn)
+sales = pd.read_sql_query("SELECT * FROM Sales", sql_conn)
+Orders = pd.read_sql_query("SELECT * Orders", sql_conn)
+items = pd.read_sql_query("SELECT * FROM Items", sql_conn)
+
+
+df = customer.merge(sales, on='customer_id')
+	.merge(orders, on='sales_id')
+	.merge(items, on='item_id' )
+	
+df_filtered = df[(df['age'] >= 18)&
+			(df['age'] <= 35 ) &
+			(df['quantity'].notnull()) &
+			(df['quantity'] > 0)]
+
+result = df_filtered.groupby(['customer_id', 'age', item_name], as_index = False)['quantity'].sum()
+result.columns = ['Customer', 'Age', 'Item', 'Quantity']
+
+result.to_csv("output.csv", sep';', index= False)
